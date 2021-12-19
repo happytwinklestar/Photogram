@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.tree.sky.domain.user.User;
 import com.tree.sky.domain.user.UserRepository;
+import com.tree.sky.handler.ex.CustomException;
 import com.tree.sky.handler.ex.CustomValidationApiException;
+import com.tree.sky.web.dto.user.UserProfileDto;
+
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -14,6 +17,24 @@ public class UserService {
 
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final UserRepository userRepository;
+	
+	
+	@Transactional(readOnly = true)
+	public UserProfileDto 회원프로필(int pageUserId, int principalId) {
+		UserProfileDto dto = new UserProfileDto(); 
+	
+		User userEntity = userRepository.findById(pageUserId).orElseThrow(()-> {
+			throw new CustomException("해당 프로필 페이지는 없는 페이지입니다.");
+		});
+		
+	
+		dto.setUser(userEntity);
+		dto.setPageOwnerState(pageUserId == principalId);
+		dto.setImageCount(userEntity.getImages().size());
+		
+		return dto;
+	}
+	
 	
 	@Transactional
 	public User 회원수정(int id, User user) {
