@@ -3,6 +3,8 @@ package com.tree.sky.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.tree.sky.domain.subscribe.SubscribeRepository;
 import com.tree.sky.domain.user.User;
 import com.tree.sky.domain.user.UserRepository;
 import com.tree.sky.handler.ex.CustomException;
@@ -17,6 +19,7 @@ public class UserService {
 
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final UserRepository userRepository;
+	private final SubscribeRepository subscribeRepository;
 	
 	
 	@Transactional(readOnly = true)
@@ -31,6 +34,12 @@ public class UserService {
 		dto.setUser(userEntity);
 		dto.setPageOwnerState(pageUserId == principalId);
 		dto.setImageCount(userEntity.getImages().size());
+		
+		int subscribeState =  subscribeRepository.mSubscribeState(principalId, pageUserId);
+		int subscribeCount = subscribeRepository.mSubscribeCount(pageUserId);
+		
+		dto.setSubscribeState(subscribeState == 1);
+		dto.setSubscribeCount(subscribeCount);
 		
 		return dto;
 	}

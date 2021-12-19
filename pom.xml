@@ -45,6 +45,13 @@
 			<version>2.4.4</version>
 		</dependency>
 	
+			
+			<dependency>
+  				  <groupId>org.qlrm</groupId>
+   				 <artifactId>qlrm</artifactId>
+   				 <version>3.0.1</version>
+			</dependency>
+			
 	
 	
 		<dependency>
