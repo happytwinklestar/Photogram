@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tree.sky.domain.user.User;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class Image {
 	private String caption; 
 	private String postImageUrl; 
 	
+	@JsonIgnoreProperties({"images"})
 	@JoinColumn(name = "userId")
 	@ManyToOne(fetch = FetchType.EAGER) 
 	private User user; 
