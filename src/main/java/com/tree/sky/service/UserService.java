@@ -1,12 +1,20 @@
 package com.tree.sky.service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tree.sky.domain.subscribe.SubscribeRepository;
 import com.tree.sky.domain.user.User;
 import com.tree.sky.domain.user.UserRepository;
+import com.tree.sky.handler.ex.CustomApiException;
 import com.tree.sky.handler.ex.CustomException;
 import com.tree.sky.handler.ex.CustomValidationApiException;
 import com.tree.sky.web.dto.user.UserProfileDto;
@@ -20,6 +28,35 @@ public class UserService {
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final UserRepository userRepository;
 	private final SubscribeRepository subscribeRepository;
+	
+	
+	
+	@Value("${file.path}")
+	private String uploadFolder;
+	
+	@Transactional
+	public User 회원프로필사진변경(int principalId, MultipartFile profileImageFile) {
+		UUID uuid = UUID.randomUUID(); 
+		String imageFileName = uuid+"_"+profileImageFile.getOriginalFilename(); 
+		System.out.println("이미지 파일이름 : "+imageFileName);
+		
+		Path imageFilePath = Paths.get(uploadFolder+imageFileName);
+		
+		try {
+			Files.write(imageFilePath, profileImageFile.getBytes());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		User userEntity = userRepository.findById(principalId).orElseThrow(()->{
+			return new CustomApiException("유저를 찾을 수 없습니다.");
+		});
+		userEntity.setProfileImageUrl(imageFileName);
+		
+		return userEntity;
+	} 
+	
+	
 	
 	
 	@Transactional(readOnly = true)
@@ -40,6 +77,10 @@ public class UserService {
 		
 		dto.setSubscribeState(subscribeState == 1);
 		dto.setSubscribeCount(subscribeCount);
+		
+		userEntity.getImages().forEach((image)->{
+			image.setLikeCount(image.getLikes().size());
+		});
 		
 		return dto;
 	}
