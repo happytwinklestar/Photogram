@@ -1,7 +1,6 @@
 package com.tree.sky.web.api;
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 import javax.validation.Valid;
 
@@ -9,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tree.sky.config.auth.PrincipalDetails;
 import com.tree.sky.domain.comment.Comment;
-import com.tree.sky.handler.ex.CustomValidationApiException;
 import com.tree.sky.service.CommentService;
 import com.tree.sky.web.dto.CMRespDto;
 import com.tree.sky.web.dto.comment.CommentDto;
@@ -34,17 +31,7 @@ public class CommentApiController {
 	
 	@PostMapping("/api/comment")
 	public ResponseEntity<?> commentSave(@Valid @RequestBody CommentDto commentDto, BindingResult bindingResult, @AuthenticationPrincipal PrincipalDetails principalDetails){
-		
-		
-		if (bindingResult.hasErrors()) {
-			Map<String, String> errorMap = new HashMap<>();
-
-			for (FieldError error : bindingResult.getFieldErrors()) {
-				errorMap.put(error.getField(), error.getDefaultMessage());
-			}
-			throw new CustomValidationApiException("유효성 검사 실패함", errorMap);
-		}
-		
+				
 		Comment comment =  commentService.댓글쓰기(commentDto.getContent(), commentDto.getImageId(), principalDetails.getUser().getId()); 
 		return new ResponseEntity<>(new CMRespDto<>(1, "댓글쓰기성공", comment), HttpStatus.CREATED);
 	}

@@ -173,6 +173,7 @@ function addComment(imageId) {
 	//console.log(data);
 	//console.log(JSON.stringify(data));
 
+
 	if (data.content === "") {
 		alert("댓글을 작성해주세요!");
 		return;
